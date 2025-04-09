@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绑定 2FA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .bind-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+        .bind-container h2 {
+            margin-bottom: 20px;
+        }
+        .bind-container p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .bind-container .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .bind-container .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .bind-container .button:hover {
+            background-color: #555;
+        }
+        .qrcode-container {
+            margin: 20px 0;
+        }
+        .qrcode-container img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<div class="bind-container">
+    <h2>绑定两步认证</h2>
+    
+    <p>使用Google/Microsoft Authenticator APP扫码绑定</p>
+    
+    <!-- 显示二维码 -->
+    <div class="qrcode-container">
+        <img src="/2faqrcode/{{username}}" alt="2FA QR Code">
+    </div>
+    
+    <p>本页面只会显示一次</p>
+
+    <button class="button" onclick=goHome()>回到首页</button>
+</div>
+<script>
+    function goHome() {
+    window.location.href = '/';
+    }
+</script>
+</body>
+</html>

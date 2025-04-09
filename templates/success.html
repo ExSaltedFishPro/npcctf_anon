@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购买确认</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .delivery-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .delivery-container h2 {
+            text-align: center;
+        }
+        .product-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .product-info img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .product-info .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .delivery-info {
+            margin-top: 20px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .delivery-info p {
+            margin: 10px 0;
+        }
+        .activation-code {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="delivery-container">
+    <h2>购买确认</h2>
+
+    <!-- 商品信息 -->
+    <div class="product-info">
+        <img src="/pics/{{item['id']}}" alt="Game Image">
+        <div>
+            <p class="product-name">{{item['name']}}</p>
+            <p>Price: ${{item['price']}}</p>
+        </div>
+    </div>
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id={{music}}&auto=1&height=66"></iframe>
+    <!-- 发货信息 -->
+    <div class="delivery-info">
+        <p>付款成功!</p>
+        <p>以下激活码只会出现一次</p>
+
+        <!-- 激活码 -->
+        <div class="activation-code">
+            激活码: <strong>{{code}}</strong>
+        </div>
+    </div>
+
+    <!-- 完成按钮 -->
+    <button class="button" onclick="goBack()">返回主页</button>
+</div>
+
+<script>
+    function goBack() {
+        window.location.href = '/';
+    }
+</script>
+
+</body>
+</html>

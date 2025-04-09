@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品信息</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .payment-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .payment-container h2 {
+            text-align: center;
+        }
+        .product-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .product-info img {
+            width: 80px; /* 正方形图像 */
+            height: 80px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .product-info .product-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .payment-container .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .payment-container .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .payment-container .button:hover {
+            background-color: #555;
+        }
+        .payment-container p {
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="payment-container">
+    <h2>支付页面</h2>
+
+    <!-- 商品信息 -->
+    <div class="product-info">
+        <img src="/pics/{{item['id']}}" alt="Game Image">
+        <div>
+            <p class="product-name">{{item['name']}}</p>
+            <p>价格: ${{item['price']}}</p>
+        </div>
+    </div>
+
+    <label for="coupon-code">优惠码:</label>
+    <input type="text" id="coupon-code" class="input-field" placeholder="Enter your coupon code">
+
+    <button class="button" onclick="processPayment()">Pay Now</button>
+
+    <p>您的余额:{{balance}}</p>
+</div>
+
+<script>
+    function processPayment() {
+        const couponCode = document.getElementById('coupon-code').value;
+        const item = "{{item['id']}}";
+        fetch('/api/pay', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({couponCode, item})
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text().then(data => {
+                        const newWindow = window.open(); // 打开新窗口
+                        newWindow.document.write(data); // 将获取的 HTML 写入新窗口
+                        newWindow.document.close(); // 关闭文档流，完成渲染
+                    });
+            }
+            alert('支付失败,检查余额或优惠码');
+        })
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理面板</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .admin-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .admin-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .admin-container .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .admin-container .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .admin-container .button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <h2>管理面板</h2>
+
+    <!-- 签发优惠码 -->
+    <h3>签发优惠码</h3>
+    <label for="coupon-type">Coupon Type:</label>
+    <select id="coupon-type" class="input-field">
+        <option value="percentage">比例</option>
+        <option value="amount">数值</option>
+    </select>
+
+    <label for="coupon-value">价值</label>
+    <input type="number" id="coupon-value" class="input-field" placeholder="Enter coupon value">
+    <button class="button" onclick="issueCoupon()">提交</button>
+
+    <hr>
+
+    <!-- 录入激活码 -->
+    <h3>录入激活码</h3>
+    <label for="activation-id">物品ID:</label>
+    <input type="text" id="activation-id" class="input-field" placeholder="Enter activation code ID">
+
+    <label for="activation-code">激活码:</label>
+    <input type="text" id="activation-code" class="input-field" placeholder="Enter activation code">
+    <!-- 2fa -->
+    <label for="2fa">2FA:</label>
+    <input type="text" id="2fa" class="input-field" placeholder="Enter 2FA code">
+    <button class="button" onclick="enterActivationCode()">录入</button>
+</div>
+
+<script>
+    // 发放优惠码函数
+    function issueCoupon() {
+        const couponType = document.getElementById('coupon-type').value;
+        const couponValue = document.getElementById('coupon-value').value;
+
+        if (!couponValue) {
+            alert('Please enter a valid coupon value!');
+            return;
+        }
+
+        fetch('/api/coupon', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: couponType,
+                value: couponValue
+            })
+        }).then(response => {
+                if (response.ok) {
+                    return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.coupon);
+                    });
+                }
+                return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.error);
+                    });
+
+            })
+    }
+
+    // 录入激活码函数
+    function enterActivationCode() {
+        const activationId = document.getElementById('activation-id').value;
+        const activationCode = document.getElementById('activation-code').value;
+        const twoFactorAuth = document.getElementById('2fa').value;
+        fetch('/api/addkey', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: activationId,
+                code: activationCode,
+                twoFactorAuth: twoFactorAuth
+            })
+        }).then(response => {
+                if (response.ok) {
+                    return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.message);
+                    });
+                }
+                return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.error);
+                    });
+
+            })
+
+    }
+</script>
+
+</body>
+</html>

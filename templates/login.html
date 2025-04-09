@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANON TOKYO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .auth-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .auth-container h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .auth-container p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .auth-container .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .auth-container .button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .auth-container .button:hover {
+            background-color: #555;
+        }
+        .toggle-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .toggle-btn a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .toggle-btn a:hover {
+            color: #555;
+        }
+        .twofa-field {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <h2 id="auth-title">登录</h2>
+    
+    <form id="auth-form">
+        <!-- 登录/注册输入框 -->
+        <label for="username">用户名:</label>
+        <input type="text" id="username" class="input-field" placeholder="Enter your username" required>
+
+        <label for="password">密码:</label>
+        <input type="password" id="password" class="input-field" placeholder="Enter your password" required>
+
+        <!-- 2FA 输入框 (只在登录时显示) -->
+        <div id="twofa-container" class="twofa-field">
+            <label for="twofa-code">两步验证码:</label>
+            <input type="text" id="twofa-code" class="input-field" placeholder="Enter 2FA code">
+        </div>
+
+        <button type="submit" class="button" id="submit-btn">Login</button>
+    </form>
+
+    <div class="toggle-btn">
+        <a href="javascript:void(0);" id="toggle-link" onclick="toggleAuthMode()">没有账户?点此注册</a>
+    </div>
+</div>
+
+<script>
+    let isLogin = true;  // 初始模式为登录
+    function toggleAuthMode() {
+        const form = document.getElementById('auth-form');
+        const title = document.getElementById('auth-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const toggleLink = document.getElementById('toggle-link');
+        const twofaContainer = document.getElementById('twofa-container');
+
+        if (isLogin) {
+            // 切换到注册模式
+            title.textContent = "Register";
+            submitBtn.textContent = "Register";
+            toggleLink.textContent = "Already have an account? Login here";
+            twofaContainer.style.display = "none";  // 注册不需要 2FA 输入框
+        } else {
+            // 切换到登录模式
+            title.textContent = "Login";
+            submitBtn.textContent = "Login";
+            toggleLink.textContent = "Don't have an account? Register here";
+            twofaContainer.style.display = "block";  // 登录需要 2FA 输入框
+        }
+
+        // 切换模式
+        isLogin = !isLogin;
+    }
+
+    // 提交表单的逻辑
+    document.getElementById('auth-form').addEventListener('submit', function (e) {
+        e.preventDefault();  // 防止表单自动提交
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if (isLogin) {
+            const twofaCode = document.getElementById('twofa-code').value;
+            if (!twofaCode) {
+                alert("Please enter the 2FA code.");
+                return;
+            }
+            // 在这里处理登录请求，包含2FA
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    twofaCode: twofaCode,
+                }),
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/';  // 登录成功后跳转到主页
+                } else {
+                    return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.error);
+                    });
+                }
+            });
+        } else {
+            // 在这里处理注册请求
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            }).then(response => {
+                if (response.ok) {
+                    return response.text().then(data => {
+                        const newWindow = window.open(); // 打开新窗口
+                        newWindow.document.write(data); // 将获取的 HTML 写入新窗口
+                        newWindow.document.close(); // 关闭文档流，完成渲染
+                    });
+
+                } else {
+                    return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.error);
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

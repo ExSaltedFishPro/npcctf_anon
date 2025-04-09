@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anon的碟片贩卖中心</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px;
+        }
+        .game-list, .comments {
+            width: 45%;
+        }
+        .game-item {
+            background-color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .game-item h3 {
+            margin: 0;
+        }
+        .game-item p {
+            margin: 5px 0;
+        }
+        .comment-form {
+            background-color: white;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .comments ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .comment-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Anon的碟片贩卖中心</h1>
+</header>
+
+<main>
+    <div class="game-list">
+        <h2>Top Disc</h2>
+        {% for d in items %}
+        <div class="game-item">
+            <h3><a href="/detail/{{ d['id'] }}">{{ d["name"] }}</a></h3>
+            <p>价格: {{ d["price"] }}</p>
+            <p>库存: {{ d["stock"] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="comments">
+        <h2>评分</h2>
+        
+        <!-- Comment Form -->
+        <div class="comment-form">
+            当前用户: {{ username }}, 余额: {{ balance }}
+            <h3>留言评论 - ANON小姐<b>会马上看的!</b></h3>
+            <input type="text" id="username" value = "{{ username }}" >
+            <textarea id="comment" rows="4" placeholder="写下你的看法..."></textarea>
+
+            <button onclick="submitComment()">提交</button>
+            <button onclick="admin()">管理</button>
+            
+            <button onclick="cls()">重置评论区(没反应访问/clear)</button>
+            评分:
+            <select name="rating" id="rating">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        
+        <!-- Comments List -->
+        <ul id="comments-list">
+            {% for c in comments %}
+            <li class="comment-item">
+                <strong>{{ c["username"] }}: {{c["rating"] }}星</strong> {{ c["comment"]|safe }}
+                <strong>ANON回复:</strong> {{ c["reply"] }}
+            </li>
+            
+            {% endfor %}
+        </ul>
+    </div>
+</main>
+
+<footer>
+    <p>ANON TOKYO © 2025</p>
+</footer>
+
+<script>
+    function admin() {
+        window.location.href = '/admin';
+    }
+    function cls() {
+        window.location.href = '/clear';
+    }
+    function submitComment() {
+        const username = document.getElementById('username').value;
+        const comment = document.getElementById('comment').value;
+        if (username && comment) {
+            fetch('/api/comment', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    comment: comment,
+                    rating: document.getElementById('rating').value
+                })
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/reply';
+                    return;
+                }
+                return response.text().then(text => JSON.parse(text)).then(data => {
+                        alert(data.error);
+                    });
+
+            });
+        }
+    }
+</script>
+</body>
+</html>
